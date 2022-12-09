@@ -4,9 +4,10 @@ require("isomorphic-fetch")
 const token = process.env['TOKEN'];
 const Discord = require('discord.js');
 const fs = require("fs");
+const { Client, IntentsBitField } = require('discord.js');
 
 const client = new Discord.Client({
-  intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_PRESENCES", "GUILD_MEMBERS"]
+  intents: [IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.Guilds]
 });
 
 const channels = require("./channels.js")
