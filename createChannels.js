@@ -12,12 +12,12 @@ const client = new Discord.Client({
 });
 
 
-const guildId = '1050962046310686760';
+const guildId = '575842109672652822';
 
 // When the client is ready, run this code (only once)
 
 client.once('ready', async () => {
-
+let json = {};
   console.log('Ready!');
 const guild = client.guilds.cache.get(guildId);
    if (guild) {
@@ -28,7 +28,8 @@ const guild = client.guilds.cache.get(guildId);
         let channel = await guild.channels.create({ name: "day-"+(i+1), type: Discord.ChannelType.GuildText, parent: category, permissionOverwrites: [
           { id: guild.roles.everyone, deny: [Discord.PermissionFlagsBits.ViewChannel] },
         ] });
-       console.log(channel)
+       json[(i+1).toString()] = channel.id;
+       console.log(json)
      }
   } else {
     console.log(`Guild not found.`);

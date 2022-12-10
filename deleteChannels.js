@@ -12,8 +12,8 @@ const client = new Discord.Client({
 });
 
 
-const guildId = '1050962046310686760';
-const categoryId = '1050969521286021150'
+const guildId = '575842109672652822';
+const categoryId = '1050983868737527838'
 
 // When the client is ready, run this code (only once)
 

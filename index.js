@@ -66,10 +66,9 @@ async function fullRefresh() {
     let id = out[user.toLowerCase()]
     if (!id) return console.log("couldnt find " + user);
 
-    // let days = completedDays[user];
+    let days = completedDays[user];
     // let days array of numbers from 1 to 25
     // let days = new Array(6).fill(0).map((_, i) => i + 1);
-    let days = [1];
 
     days.forEach(async (completed) => {
       // console.log(channels[completed])
@@ -92,17 +91,6 @@ async function fullRefresh() {
           //                 channel.send("added "+user+"!")
         } else {
           //already is in channel
-        }
-
-        for (value of channel.permissionOverwrites.cache.values()) {
-          // where is key from?
-          // await channel.permissionOverwrites.cache.get(key).delete();
-          // if (value.allow.has(PermissionFlagsBits.ViewChannel)) {
-          //   await channel.permissionOverwrites.edit(value.id, {
-          //     SendMessages: false,
-          //     ViewChannel: false
-          //   });
-          // }
         }
       } else {
         // already removed
