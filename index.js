@@ -55,11 +55,9 @@ function fullRefresh() {
     const me = await guild.members.fetchMe();
     if (me.permissions.has(PermissionFlagsBits.ManageGuild)) {
       console.log("I have the Permission Manage Channels");
-      // console.log(me.permissions.toArray())
 
     } else {
       console.log("I don't have Permission Manage Channels");
-      // console.log(me.permissions.toArray())
     }
 
 
@@ -115,9 +113,7 @@ function fullRefresh() {
           // already removed
           console.log("already removed")
         }
-
       })
-
     })
   })
 };
@@ -155,11 +151,9 @@ client.on("messageCreate", async (msg) => {
   // console.log('??')
   if (msg.author.bot) return;
 
-
   msg.guild.channels.create({
     name: "hello",
     type: ChannelType.GuildText,
-    // your permission overwrites or other options here
   });
 
 })
