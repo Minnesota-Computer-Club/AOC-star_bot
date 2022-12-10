@@ -3,3 +3,6 @@ out.json
 .env
 .breakpoints
 node_modules/
+.upm
+.cache
+.config
