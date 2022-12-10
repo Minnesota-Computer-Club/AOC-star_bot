@@ -40,91 +40,81 @@ const refresh = async () => {
     return t;
   })
 }
-function fullRefresh() {
-  refresh().then(async _ => {
-    const completedDays = {};
-    const aocData = leaderboard["members"];
-    const aocIds = Object.keys(aocData);
-    for (var i = 0; i < aocIds.length; i++) {
-      const n = Object.keys(aocData[aocIds[i]].completion_day_level);
-      const username = aocToDisc[aocData[aocIds[i]].name];
-      if (username) completedDays[username] = n;
-    }
 
-    const guild = client.guilds.cache.get(creds.ROCHESTER_GUILD);
-    const me = await guild.members.fetchMe();
-    if (me.permissions.has(PermissionFlagsBits.ManageGuild)) {
-      console.log("I have the Permission Manage Channels");
+async function fullRefresh() {
+  await refresh();
+  const completedDays = {};
+  const aocData = leaderboard["members"];
+  const aocIds = Object.keys(aocData);
+  for (var i = 0; i < aocIds.length; i++) {
+    const n = Object.keys(aocData[aocIds[i]].completion_day_level);
+    const username = aocToDisc[aocData[aocIds[i]].name];
+    if (username) completedDays[username] = n;
+  }
 
-    } else {
-      console.log("I don't have Permission Manage Channels");
-    }
+  const guild = client.guilds.cache.get(creds.ROCHESTER_GUILD);
+  const me = await guild.members.fetchMe();
+  if (me.permissions.has(PermissionFlagsBits.ManageGuild)) {
+    console.log("I have the Permission Manage Channels");
 
+  } else {
+    console.log("I don't have Permission Manage Channels");
+  }
 
-    const out = JSON.parse(fs.readFileSync("./out.json"))
-    Object.keys(completedDays).forEach((user) => {
-      let id = out[user.toLowerCase()]
-      if (!id) return console.log("couldnt find " + user);
+  const out = JSON.parse(fs.readFileSync("./out.json"))
+  Object.keys(completedDays).forEach((user) => {
+    let id = out[user.toLowerCase()]
+    if (!id) return console.log("couldnt find " + user);
 
-      // let days = completedDays[user];
-      // let days array of numbers from 1 to 25
-      // let days = new Array(6).fill(0).map((_, i) => i + 1);
-      let days = [1];
+    // let days = completedDays[user];
+    // let days array of numbers from 1 to 25
+    // let days = new Array(6).fill(0).map((_, i) => i + 1);
+    let days = [1];
 
+    days.forEach(async (completed) => {
+      // console.log(channels[completed])
 
+      const guild = client.guilds.resolve(creds.ROCHESTER_GUILD);
+      const channelss = await guild.channels.fetch();
+      let channel = [...channelss.values()].find(c => c.id == channels[completed]);
+      if (channel) {
+        const id = user.id;
 
-      days.forEach(async (completed) => {
-        // console.log(channels[completed])
+        if (!channel.permissionOverwrites.resolve(id)) {
+          // duser is discord user
+          // hmm how can we get user obj
 
-        const guild = client.guilds.resolve(creds.ROCHESTER_GUILD);
-        const channelss = await guild.channels.fetch();
-        let channel = [...channelss.values()].find(c => c.id == channels[completed]);
-        if (channel) {
-          const id = user.id;
-
-          if (!channel.permissionOverwrites.resolve(id)) {
-
-            // duser is discord user
-            // hmm how can we get user obj
-
-            //                 channel.permissionOverwrites.create(id, {
-            //                   SEND_MESSAGES: true,
-            //                   VIEW_CHANNEL: true
-            //                 });
-            // console.log("added "+user+" to "+completed)
-            //                 channel.send("added "+user+"!")
-
-          } else {
-            //already is in channel
-          }
-
-          for (value of channel.permissionOverwrites.cache.values()) {
-            // where is key from?
-            // await channel.permissionOverwrites.cache.get(key).delete();
-            // if (value.allow.has(PermissionFlagsBits.ViewChannel)) {
-            //   await channel.permissionOverwrites.edit(value.id, {
-            //     SendMessages: false,
-            //     ViewChannel: false
-            //   });
-            // }
-          }
-
+          //                 channel.permissionOverwrites.create(id, {
+          //                   SEND_MESSAGES: true,
+          //                   VIEW_CHANNEL: true
+          //                 });
+          // console.log("added "+user+" to "+completed)
+          //                 channel.send("added "+user+"!")
         } else {
-          // already removed
-          console.log("already removed")
+          //already is in channel
         }
-      })
-    })
-  })
-};
 
-setInterval(() => {
-  fullRefresh();
-}, 60000)
+        for (value of channel.permissionOverwrites.cache.values()) {
+          // where is key from?
+          // await channel.permissionOverwrites.cache.get(key).delete();
+          // if (value.allow.has(PermissionFlagsBits.ViewChannel)) {
+          //   await channel.permissionOverwrites.edit(value.id, {
+          //     SendMessages: false,
+          //     ViewChannel: false
+          //   });
+          // }
+        }
+      } else {
+        // already removed
+        console.log("already removed")
+      }
+    });
+  });
+}
+
 // When the client is ready, run this code (only once)
 
 client.once('ready', async () => {
-
   console.log('Ready!');
 
   async function discordFetch() {
@@ -142,9 +132,14 @@ client.once('ready', async () => {
 
   setInterval(() => {
     discordFetch();
-  }, 1800000)
+  }, 1800000);
+
   await discordFetch();
   fullRefresh();
+
+  setInterval(async () => {
+    await fullRefresh();
+  }, 60000);
 });
 
 client.on("messageCreate", async (msg) => {
