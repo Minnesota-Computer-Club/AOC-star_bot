@@ -5,10 +5,15 @@ const creds = require('./.config/creds.json');
 const token = process.env['TOKEN'];
 const Discord = require('discord.js');
 const fs = require("fs");
-const { Client, IntentsBitField, PermissionFlagsBits } = require('discord.js');
+const { IntentsBitField, PermissionFlagsBits, PermissionsBitField  } = require('discord.js');
 
 const client = new Discord.Client({
-  intents: [IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.Guilds]
+  intents: [
+    IntentsBitField.Flags.GuildMembers,
+    IntentsBitField.Flags.Guilds,
+    // IntentsBitField.Flags.MessageContent,
+    // IntentsBitField.Flags.GuildMessages,
+  ],
 });
 
 const channels = require("./channels.js")
@@ -97,12 +102,12 @@ function fullRefresh() {
 
           for (value of channel.permissionOverwrites.cache.values()) {
             // await channel.permissionOverwrites.cache.get(key).delete();
-            if (value.allow.has(PermissionFlagsBits.ViewChannel)) {
-              await channel.permissionOverwrites.edit(value.id, {
-                SendMessages: false,
-                ViewChannel: false
-              });
-            }
+            // if (value.allow.has(PermissionFlagsBits.ViewChannel)) {
+            //   await channel.permissionOverwrites.edit(value.id, {
+            //     SendMessages: false,
+            //     ViewChannel: false
+            //   });
+            // }
           }
 
         } else {
@@ -145,6 +150,11 @@ client.once('ready', async () => {
   await discordFetch();
   fullRefresh();
 });
+
+client.on("messageCreate", (msg) => {
+  // console.log('??')
+  if (!msg.author.bot) msg.reply("ee")
+})
 
 // client
 //     .on("debug", console.log)
