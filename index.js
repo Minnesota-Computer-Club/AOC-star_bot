@@ -132,7 +132,7 @@ client.once('ready', async () => {
     members.forEach((user) => {
       savejson[user.user.username.toLowerCase()] = user.id;
     })
-    fs.writeFile('./out.json', JSON.stringify(savejson), function(err) {
+    fs.writeFile('./out.json', JSON.stringify(savejson), function (err) {
       if (err) throw err;
       console.log('complete');
     }
