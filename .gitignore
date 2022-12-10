@@ -1,5 +1,5 @@
-*.json
-*.replit
-*.env
-*.breakpoints
+users.json
+out.json
+.env
+.breakpoints
 node_modules/
