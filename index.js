@@ -134,16 +134,6 @@ client.once('ready', async () => {
   }, 60000);
 });
 
-client.on("messageCreate", async (msg) => {
-  // console.log('??')
-  if (msg.author.bot) return;
-
-  msg.guild.channels.create({
-    name: "hello",
-    type: ChannelType.GuildText,
-  });
-
-})
 
 // client
 //   .on("debug", console.log)

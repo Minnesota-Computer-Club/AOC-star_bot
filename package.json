@@ -11,7 +11,7 @@
       "node": "^16.13.1"
     },
     "scripts": {
-      "start": "node index.js"
+      "run": "node index.js"
     },
     "repository": {
       "type": "git",
