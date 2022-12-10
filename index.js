@@ -5,7 +5,7 @@ const creds = require('./.config/creds.json');
 const token = process.env['TOKEN'];
 const Discord = require('discord.js');
 const fs = require("fs");
-const { IntentsBitField, PermissionFlagsBits, PermissionsBitField  } = require('discord.js');
+const { IntentsBitField, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
 
 const client = new Discord.Client({
   intents: [
@@ -140,8 +140,7 @@ client.once('ready', async () => {
     fs.writeFile('./out.json', JSON.stringify(savejson), function (err) {
       if (err) throw err;
       console.log('complete');
-    }
-    );
+    });
   }
 
   setInterval(() => {
