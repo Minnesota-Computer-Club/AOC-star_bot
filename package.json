@@ -1,5 +1,5 @@
 {
-    "name": "AOC-bot",
+    "name": "aoc-bot",
     "version": "1.0.0",
     "description": "Gives users permissions to channels based on completion of AOC stars Bakes cookies",
     "main": "index.js",
