@@ -47,7 +47,7 @@ function log(m) {
 }
 
 async function fullRefresh() {
-  log("Starting fullRefresh")
+  log("\n\nStarting Full Refresh")
   await refresh();
   log("AOC Leaderboard Query completed")
   
@@ -55,8 +55,12 @@ async function fullRefresh() {
   const aocData = leaderboard["members"];
   const aocIds = Object.keys(aocData);
   for (var i = 0; i < aocIds.length; i++) {
-    const n = Object.keys(aocData[aocIds[i]].completion_day_level);
+    let n = Object.keys(aocData[aocIds[i]].completion_day_level);
+    n = n.map((d) => {
+      return {i:d,d:aocData[aocIds[i]].completion_day_level[d]};
+    }).filter((d) => d.d[2]).map((d) => d.i);
     const username = aocToDisc[aocData[aocIds[i]].name];
+    
     if (username) completedDays[username] = n;
   }
   log("Days of users fetched")
