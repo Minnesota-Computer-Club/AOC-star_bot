@@ -5,14 +5,14 @@ const creds = require('./.config/creds.json');
 const token = process.env['TOKEN'];
 const Discord = require('discord.js');
 const fs = require("fs");
-const { IntentsBitField, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
+const { IntentsBitField, PermissionFlagsBits, PermissionsBitField, ChannelType } = require('discord.js');
 
 const client = new Discord.Client({
   intents: [
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.Guilds,
-    // IntentsBitField.Flags.MessageContent,
-    // IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.GuildMessages,
   ],
 });
 
@@ -55,11 +55,11 @@ function fullRefresh() {
     const me = await guild.members.fetchMe();
     if (me.permissions.has(PermissionFlagsBits.ManageGuild)) {
       console.log("I have the Permission Manage Channels");
-      console.log(me.permissions.toArray())
+      // console.log(me.permissions.toArray())
 
     } else {
       console.log("I don't have Permission Manage Channels");
-      console.log(me.permissions.toArray())
+      // console.log(me.permissions.toArray())
     }
 
 
@@ -101,6 +101,7 @@ function fullRefresh() {
           }
 
           for (value of channel.permissionOverwrites.cache.values()) {
+            // where is key from?
             // await channel.permissionOverwrites.cache.get(key).delete();
             // if (value.allow.has(PermissionFlagsBits.ViewChannel)) {
             //   await channel.permissionOverwrites.edit(value.id, {
@@ -150,9 +151,17 @@ client.once('ready', async () => {
   fullRefresh();
 });
 
-client.on("messageCreate", (msg) => {
+client.on("messageCreate", async (msg) => {
   // console.log('??')
-  if (!msg.author.bot) msg.reply("ee")
+  if (msg.author.bot) return;
+
+
+  msg.guild.channels.create({
+    name: "hello",
+    type: ChannelType.GuildText,
+    // your permission overwrites or other options here
+  });
+
 })
 
 // client
