@@ -8,14 +8,13 @@ require("isomorphic-fetch")
 
 const url = `https://adventofcode.com/2022/leaderboard/private/view/${leaderboard}.json`
 
-module.exports = async () => { 
-  
-const f = await fetch(url, {
-  method: 'GET',
-  headers: {
-    'Cookie': 'session='+session
-  }
-});
+module.exports = async () => {
+  const f = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Cookie': 'session=' + session
+    }
+  });
 
   return await f.json();
 };
