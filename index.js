@@ -41,8 +41,16 @@ const refresh = async () => {
   })
 }
 
+let debug = true;
+function log(m) {
+  if(debug) console.log(m)
+}
+
 async function fullRefresh() {
+  log("Starting fullRefresh")
   await refresh();
+  log("AOC Leaderboard Query completed")
+  
   const completedDays = {};
   const aocData = leaderboard["members"];
   const aocIds = Object.keys(aocData);
@@ -51,53 +59,50 @@ async function fullRefresh() {
     const username = aocToDisc[aocData[aocIds[i]].name];
     if (username) completedDays[username] = n;
   }
+  log("Days of users fetched")
+  
 
   const guild = client.guilds.cache.get(creds.ROCHESTER_GUILD);
-  const me = await guild.members.fetchMe();
-  if (me.permissions.has(PermissionFlagsBits.ManageGuild)) {
-    console.log("I have the Permission Manage Channels");
-
-  } else {
-    console.log("I don't have Permission Manage Channels");
-  }
+    const guildChannels = await guild.channels.fetch();
 
   const out = JSON.parse(fs.readFileSync("./out.json"))
-  Object.keys(completedDays).forEach((user) => {
+  log("Fetched guild and user details")
+  
+    for (let user of Object.keys(completedDays)) {
     let id = out[user.toLowerCase()]
     if (!id) return console.log("couldnt find " + user);
 
     let days = completedDays[user];
     // let days array of numbers from 1 to 25
     // let days = new Array(6).fill(0).map((_, i) => i + 1);
-
-    days.forEach(async (completed) => {
+  // for each isn't async it's going to spam all the requests at once
+    for (let completed of days) {
       // console.log(channels[completed])
 
       const guild = client.guilds.resolve(creds.ROCHESTER_GUILD);
-      const channelss = await guild.channels.fetch();
-      let channel = [...channelss.values()].find(c => c.id == channels[completed]);
+    
+      let channel = [...guildChannels.values()].find(c => c.id == channels[completed]);
       if (channel) {
-        const id = user.id;
 
         if (!channel.permissionOverwrites.resolve(id)) {
           // duser is discord user
           // hmm how can we get user obj
 
-          //                 channel.permissionOverwrites.create(id, {
-          //                   SEND_MESSAGES: true,
-          //                   VIEW_CHANNEL: true
-          //                 });
-          // console.log("added "+user+" to "+completed)
-          //                 channel.send("added "+user+"!")
+          await channel.permissionOverwrites.create(id, {
+            SendMessages: true,
+            ViewChannel: true
+          });
+          console.log("added " + user + " to " + completed)
+          await channel.send("added " + user + "!")
         } else {
           //already is in channel
         }
       } else {
         // already removed
-        console.log("already removed")
+        console.log("channel not found")
       }
-    });
-  });
+    };
+  };
 }
 
 // When the client is ready, run this code (only once)
@@ -112,9 +117,8 @@ client.once('ready', async () => {
     members.forEach((user) => {
       savejson[user.user.username.toLowerCase()] = user.id;
     })
-    fs.writeFile('./out.json', JSON.stringify(savejson), function (err) {
+    fs.writeFile('./out.json', JSON.stringify(savejson), function(err) {
       if (err) throw err;
-      console.log('complete');
     });
   }
 
@@ -142,8 +146,8 @@ client.on("messageCreate", async (msg) => {
 })
 
 // client
-//     .on("debug", console.log)
-//     .on("warn", console.log)
+//   .on("debug", console.log)
+//   .on("warn", console.log)
 
 // Login to Discord with your client's token
 client.login(token);
