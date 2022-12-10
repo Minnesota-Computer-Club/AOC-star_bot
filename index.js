@@ -5,10 +5,10 @@ const creds = require('./.config/creds.json');
 const token = process.env['TOKEN'];
 const Discord = require('discord.js');
 const fs = require("fs");
-const { Client, IntentsBitField } = require('discord.js');
+const { Client, IntentsBitField, PermissionFlagsBits } = require('discord.js');
 
 const client = new Discord.Client({
-	intents: [IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.Guilds,]
+	intents: [IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.Guilds]
 });
 
 const channels = require("./channels.js")
@@ -36,7 +36,7 @@ const refresh = async () => {
 	})
 }
 function fullRefresh() {
-	refresh().then(_ => {
+	refresh().then(async _ => {
 		const completedDays = {};
 		const aocData = leaderboard["members"];
 		const aocIds = Object.keys(aocData);
@@ -45,16 +45,33 @@ function fullRefresh() {
 			const username = aocToDisc[aocData[aocIds[i]].name];
 			if (username) completedDays[username] = n;
 		}
+
+		const guild = client.guilds.cache.get(creds.ROCHESTER_GUILD);
+		const me = await guild.members.fetchMe();
+		if (me.permissions.has(PermissionFlagsBits.ManageGuild)) {
+			console.log("I have the Permission Manage Channels");
+			console.log(me.permissions.toArray())
+
+		} else {
+			console.log("I don't have Permission Manage Channels");
+			console.log(me.permissions.toArray())
+		}
+
+
 		const out = JSON.parse(fs.readFileSync("./out.json"))
 		Object.keys(completedDays).forEach((user) => {
 			let id = out[user.toLowerCase()]
 			if (!id) return console.log("couldnt find " + user);
 
-			let days = completedDays[user];
+			// let days = completedDays[user];
+			// let days array of numbers from 1 to 25
+			// let days = new Array(6).fill(0).map((_, i) => i + 1);
+			let days = [1];
+
 
 
 			days.forEach(async (completed) => {
-				console.log(channels[completed])
+				// console.log(channels[completed])
 
 				const guild = client.guilds.resolve(creds.ROCHESTER_GUILD);
 				const channelss = await guild.channels.fetch();
@@ -78,10 +95,23 @@ function fullRefresh() {
 						//already is in channel
 					}
 
-					await channel.permissionOverwrites.create(channel.guild.roles.everyone, { ViewChannel: false })
-					console.log("channel " + channel.name)
-				} else console.log("channel " + completed + " not found")
+					for (value of channel.permissionOverwrites.cache.values()) {
+						// await channel.permissionOverwrites.cache.get(key).delete();
+						if (value.allow.has(PermissionFlagsBits.ViewChannel)) {
+							await channel.permissionOverwrites.edit(value.id, {
+								SendMessages: false,
+								ViewChannel: false
+							});
+						}
+					}
+
+				} else {
+					// already removed
+					console.log("already removed")
+				}
+
 			})
+
 		})
 	})
 };
