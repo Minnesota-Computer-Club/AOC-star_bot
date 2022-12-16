@@ -50,31 +50,37 @@ async function fullRefresh() {
   log("\n\nStarting Full Refresh")
   await refresh();
   log("AOC Leaderboard Query completed")
-  
+
   const completedDays = {};
   const aocData = leaderboard["members"];
   const aocIds = Object.keys(aocData);
   for (var i = 0; i < aocIds.length; i++) {
     let n = Object.keys(aocData[aocIds[i]].completion_day_level);
+    // console.log(n);
     n = n.map((d) => {
       return {i:d,d:aocData[aocIds[i]].completion_day_level[d]};
     }).filter((d) => d.d[2]).map((d) => d.i);
     const username = aocToDisc[aocData[aocIds[i]].name];
-    
+
     if (username) completedDays[username] = n;
   }
   log("Days of users fetched")
-  
+
 
   const guild = client.guilds.cache.get(creds.ROCHESTER_GUILD);
     const guildChannels = await guild.channels.fetch();
 
   const out = JSON.parse(fs.readFileSync("./out.json"))
   log("Fetched guild and user details")
-  
-    for (let user of Object.keys(completedDays)) {
+
+  console.log(Object.keys(completedDays));
+    for (let i=0; i<Object.keys(completedDays).length; i++) {
+      let user = Object.keys(completedDays)[i];
     let id = out[user.toLowerCase()]
-    if (!id) return console.log("couldnt find " + user);
+    if (!id){
+      console.log("couldnt find " + user);
+      continue;
+    }
 
     let days = completedDays[user];
     // let days array of numbers from 1 to 25
@@ -84,7 +90,7 @@ async function fullRefresh() {
       // console.log(channels[completed])
 
       const guild = client.guilds.resolve(creds.ROCHESTER_GUILD);
-    
+
       let channel = [...guildChannels.values()].find(c => c.id == channels[completed]);
       if (channel) {
 
