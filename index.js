@@ -103,7 +103,7 @@ async function fullRefresh() {
             ViewChannel: true
           });
           console.log("added " + user + " to " + completed)
-          await channel.send("added " + user + "!")
+          await channel.send("added <@" + id + "> !")
         } else {
           //already is in channel
         }
